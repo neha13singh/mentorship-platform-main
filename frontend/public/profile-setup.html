@@ -57,10 +57,36 @@
         transition: background 0.3s; /* Transition effect */
         margin: 1rem 0; /* Spacing above and below button */
       }
+      .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 1px;
+        margin-bottom:20px;
+      }
 
       .btn:hover {
         background: #1976d2; /* Darker button color on hover */
       }
+      .skill-tag {
+        background: #3498db;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+      }
+
+      .skill-tag i {
+        margin-left: 5px;
+        cursor: pointer;
+      }
+
+      .skill-tag i:hover {
+        color: #e74c3c;
+      }
+
 
       /* Additional styling for register button placement */
       .register-btn-container {

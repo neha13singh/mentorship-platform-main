@@ -29,24 +29,30 @@
       }
 
       header {
-        background: #084071; /* Changed color */
+        background-color: #084071;
         color: white;
-        padding: 1rem 2rem;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        text-align: center;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       }
 
       header h1 {
         font-size: 2rem;
         font-weight: 600;
       }
+      .header h2 {
+        margin: 0;
+        font-size: 2.5rem;
+        font-weight: bold;
+      }
 
       .header-buttons {
         display: flex;
-        gap: 1rem;
-        align-items: center;
+        flex-direction: column;
+        gap: 10px;
       }
 
       .profile-btn,
@@ -163,12 +169,21 @@
       }
 
       @media (max-width: 768px) {
-        main {
-          padding: 0 1rem;
+        .header {
+          flex-direction: column;
+          padding: 10px;
         }
 
-        .mentor-card {
-          padding: 1rem;
+        .header h2 {
+          font-size: 2rem;
+        }
+
+        .dashboard-content {
+          flex-direction: column;
+        }
+
+        .card {
+          flex: 1 1 100%;
         }
       }
     </style>
