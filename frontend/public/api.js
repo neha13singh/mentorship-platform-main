@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://mentorship-platform-backend.onrender.com/api"; // Base URL for API calls
+const API_BASE_URL = "https://mentorship-platform-main-backend.onrender.com/api"; // Base URL for API calls
 
 // Function to register a user
 async function registerUser(data) {
