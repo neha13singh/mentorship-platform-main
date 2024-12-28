@@ -108,6 +108,9 @@
                     localStorage.setItem('user_id', result.data.id);
                     window.location.href = 'profile-setup.html';
                 }
+                else{
+                    alert(result.message);
+                }
             });
         });
     </script>
