@@ -22,6 +22,10 @@ Welcome to the Mentorship Matching Platform! This platform connects mentors and 
 - Viewing accepted mentors and mentees
 - Responsive design
 
+## Demo
+
+You can access the live version of the Mentorship Matching Platform at [https://mentorship-platform-main.onrender.com](https://mentorship-platform-main.onrender.com).
+
 ## Project Structure
 # Mentorship Matching Platform
 
@@ -140,7 +144,7 @@ Welcome to the Mentorship Matching Platform! This platform connects mentors and 
 - **Remove Mentee**: `POST /api/mentorship/remove-mentee/:mentorUserId/:menteeUserId`
 
 ## Environment Variables
-# Database Configuration
+### Database Configuration
 DB_HOST=your-database-host
 DB_USER=your-database-user
 DB_PASSWORD=your-database-password
