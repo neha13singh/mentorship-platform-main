@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile Setup - Mentorship Platform</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <script type="module" src="./commons/auth.js"></script>
+
+    <style>
+      body {
+        background-color: #e3f2fd; /* Light blue background */
+        font-family: "Arial", sans-serif;
+        display: flex; /* Use flexbox for centering */
+        justify-content: center; /* Center horizontally */
+        align-items: center; /* Center vertically */
+        height: 100%; /* Full viewport height */
+        margin: 0; /* Remove default margin */
+      }
+
+      .profile-container {
+        max-width: 600px; /* Set a maximum width for the form */
+        width: 100%; /* Full width */
+        margin: 20px; /* Margin around the container */
+        padding: 2rem; /* Padding inside the form */
+        border-radius: 15px; /* Rounded corners */
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+        background: white; /* White background for the form */
+      }
+
+      .profile-header h1 {
+        font-size: 2.5rem; /* Increased title size */
+        color: #084071; /* Title color */
+        margin-bottom: 20px; /* Spacing below title */
+        text-align: center; /* Center align title */
+      }
+
+      .form-group label {
+        color: #248ae4; /* Label color */
+        font-weight: 600; /* Font weight */
+      }
+
+      .btn {
+        width: 100%; /* Full width for button */
+        padding: 12px; /* Padding inside button */
+        background: #2196f3; /* Button color */
+        color: white; /* Text color */
+        border: none; /* No border */
+        border-radius: 5px; /* Rounded corners */
+        font-size: 16px; /* Font size */
+        cursor: pointer; /* Pointer cursor on hover */
+        transition: background 0.3s; /* Transition effect */
+        margin: 1rem 0; /* Spacing above and below button */
+      }
+
+      .btn:hover {
+        background: #1976d2; /* Darker button color on hover */
+      }
+
+      /* Additional styling for register button placement */
+      .register-btn-container {
+        margin-top: 1rem; /* Margin above the register button */
+        display: flex; /* Use flexbox for alignment */
+        justify-content: center; /* Center align the register button */
+        align-items: center; /* Center align vertically */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="profile-container">
+      <div class="profile-header">
+        <h1>Complete Your Profile</h1>
+        <p>Let's make your profile stand out!</p>
+      </div>
+
+      <form id="profileForm">
+        <div class="form-section">
+          <div class="form-group">
+            <label>Bio</label>
+            <textarea
+              name="bio"
+              placeholder="Tell us about yourself..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Skills</label>
+            <input
+              type="text"
+              id="skillInput"
+              placeholder="Add skills (press Enter to add)"
+            />
+            <div class="skills-container" id="skillsContainer"></div>
+            <input type="hidden" name="skills" id="skillsHidden" />
+          </div>
+
+          <div class="form-group">
+            <label>Interests</label>
+            <input
+              type="text"
+              id="interestInput"
+              placeholder="Add interests (press Enter to add)"
+            />
+            <div class="skills-container" id="interestsContainer"></div>
+            <input type="hidden" name="interests" id="interestsHidden" />
+          </div>
+
+          <div class="privacy-toggle">
+            <input type="checkbox" id="isPublic" name="is_public" checked />
+            <label for="isPublic">Make profile public</label>
+          </div>
+        </div>
+
+        <input type="hidden" name="user_id" id="user_id" />
+        <button type="submit" class="btn">Save Profile</button>
+      </form>
+    </div>
+
+    <script>
+      const API_BASE_URL = "https://mentorship-platform-backend.onrender.com/api"; // Base URL for API calls
+      document.addEventListener("DOMContentLoaded", () => {
+        const userId = localStorage.getItem("user_id");
+        document.getElementById("user_id").value = userId;
+
+        // Handle skills and interests
+        function setupTagInput(inputId, containerId, hiddenInputId) {
+          const input = document.getElementById(inputId);
+          const container = document.getElementById(containerId);
+          const hiddenInput = document.getElementById(hiddenInputId);
+          const tags = new Set();
+
+          function updateTags() {
+            container.innerHTML = "";
+            tags.forEach((tag) => {
+              const tagElement = document.createElement("div");
+              tagElement.className = "skill-tag";
+              tagElement.innerHTML = `
+                            ${tag}
+                            <i class="fas fa-times" onclick="this.parentElement.remove(); updateHiddenInput();"></i>
+                        `;
+              container.appendChild(tagElement);
+            });
+            hiddenInput.value = Array.from(tags).join(",");
+          }
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              const value = input.value.trim();
+              if (value) {
+                tags.add(value);
+                input.value = "";
+                updateTags();
+              }
+            }
+          });
+        }
+
+        setupTagInput("skillInput", "skillsContainer", "skillsHidden");
+        setupTagInput("interestInput", "interestsContainer", "interestsHidden");
+
+        // Handle form submission
+        document
+          .getElementById("profileForm")
+          .addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            data.is_public = formData.get("is_public") === "on";
+
+            try {
+              const response = await fetch(`${API_BASE_URL}/profile`, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+                body: JSON.stringify(data),
+              });
+
+              const result = await response.json();
+              if (result.success) {
+                alert("Profile updated successfully!");
+
+                setTimeout(() => {
+                  window.location.href = "login.html"; // Redirect to login page after profile setup
+                }, 1000);
+              } else {
+                throw new Error(result.message);
+              }
+            } catch (error) {
+              alert(error.message);
+            }
+          });
+      });
+    </script>
+  </body>
+</html>

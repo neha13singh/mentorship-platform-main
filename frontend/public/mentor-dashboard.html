@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mentor Dashboard</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        background: #f5f7fb;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      header {
+        background: #084071;
+        color: white;
+        padding: 1rem 2rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      header h1 {
+        font-size: 2rem;
+        font-weight: 600;
+      }
+
+      .header-buttons {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+
+      .profile-btn,
+      .logout-btn {
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+        padding: 0.5rem 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+      }
+
+      .profile-btn:hover,
+      .logout-btn:hover {
+        background: white;
+        color: #084071;
+      }
+
+      .user-info {
+        background: #248ae4;
+        color: white;
+        padding: 0.5rem 2rem;
+        font-size: 1rem;
+      }
+
+      main {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+      }
+
+      section {
+        margin-bottom: 3rem;
+      }
+
+      section h2 {
+        color: #084071;
+        margin-bottom: 1.5rem;
+        font-size: 1.5rem;
+        border-bottom: 2px solid #3498db;
+        padding-bottom: 0.5rem;
+      }
+
+      .mentee-card,
+      .request-card {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s ease;
+      }
+
+      .mentee-card:hover,
+      .request-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .mentee-card h3,
+      .request-card h3 {
+        color: #248ae4;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+      }
+
+      .mentee-card p,
+      .request-card p {
+        color: #666;
+        margin-bottom: 0.8rem;
+      }
+
+      button {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        font-weight: 500;
+        margin-right: 0.5rem;
+      }
+
+      button:hover {
+        background: #2980b9;
+      }
+
+      button.reject {
+        background: #e74c3c;
+      }
+
+      button.reject:hover {
+        background: #c0392b;
+      }
+
+      .remove-mentee-btn {
+        background: #e74c3c;
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        font-weight: 500;
+        margin-right: 0.5rem;
+      }
+
+      .remove-mentee-btn:hover {
+        background: #c0392b;
+      }
+
+      #menteeList,
+      #requestList {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+      }
+
+      footer {
+        text-align: center;
+        padding: 2rem;
+        background: #084071;
+        color: white;
+        margin-top: 3rem;
+      }
+
+      @media (max-width: 768px) {
+        main {
+          padding: 0 1rem;
+        }
+
+        .mentee-card,
+        .request-card {
+          padding: 1rem;
+        }
+      }
+    </style>
+    <script type="module">
+      import { checkAuth } from "./commons/auth.js";
+      checkAuth();
+    </script>
+
+    <script>
+      const API_BASE_URL = "https://mentorship-platform-backend.onrender.com/api";
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const userId = localStorage.getItem("userId");
+        const username = localStorage.getItem("username");
+        const role = localStorage.getItem("role");
+
+        // Display user info at the top
+        const userInfo = document.createElement("div");
+        userInfo.className = "user-info";
+        userInfo.innerHTML = `<h2>Welcome, ${username || "Guest"} 👋</h2>`;
+        document.body.insertBefore(userInfo, document.querySelector("main"));
+
+        const mentees = await fetchMentees(userId);
+        const menteeList = document.getElementById("menteeList");
+        const requests = await fetchRequests(userId);
+        const requestList = document.getElementById("requestList");
+
+        // Display mentees
+        menteeList.innerHTML = mentees
+          .map((mentee) => {
+            const skillsArray = Array.isArray(mentee.skills)
+              ? mentee.skills
+              : mentee.skills
+              ? mentee.skills.split(",")
+              : [];
+            const interestsArray = Array.isArray(mentee.interests)
+              ? mentee.interests
+              : mentee.interests
+              ? mentee.interests.split(",")
+              : [];
+            return `
+                    <div class="mentee-card">
+                        <h3>👤 ${mentee.username} - ${mentee.role}</h3>
+                        <p><strong>Bio:</strong> ${
+                          mentee.bio || "No bio available"
+                        }</p>
+                        <p><strong>Skills:</strong> ${
+                          skillsArray.join(", ") || "No skills listed"
+                        }</p>
+                        <p><strong>Interests:</strong> ${
+                          interestsArray.join(", ") || "No interests listed"
+                        }</p>
+                        <button class="remove-mentee-btn" onclick="removeMentee(${userId}, ${
+              mentee.id
+            })">Remove</button>
+                    </div>
+                `;
+          })
+          .join("");
+
+        // Display requests
+        requestList.innerHTML = requests
+          .map((request) => {
+            return `
+                    <div class="request-card">
+                        <h3>👤 ${request.requestor_username} - ${request.requestor_role}</h3>
+                        <p><strong>Message:</strong> ${request.message}</p>
+                        <button onclick="acceptRequest(${request.id})">✅ Accept</button>
+                        <button class="reject" onclick="rejectRequest(${request.id})">❌ Reject</button>
+                    </div>
+                `;
+          })
+          .join("");
+      });
+
+      async function fetchMentees(userId) {
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/mentorship/mentees/${userId}`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch mentees");
+          }
+          return response.json();
+        } catch (error) {
+          console.error("Error:", error);
+          return [];
+        }
+      }
+
+      async function fetchRequests(userId) {
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/mentorship/requests/${userId}`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch requests");
+          }
+          return response.json();
+        } catch (error) {
+          console.error("Error:", error);
+          return [];
+        }
+      }
+
+      async function acceptRequest(requestId) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/mentorship/accept`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ requestId }),
+          });
+          const result = await response.json();
+          alert(result.message);
+          location.reload();
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Failed to accept request. Please try again.");
+        }
+      }
+
+      async function rejectRequest(requestId) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/mentorship/reject`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ requestId }),
+          });
+          const result = await response.json();
+          alert(result.message);
+          location.reload();
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Failed to reject request. Please try again.");
+        }
+      }
+
+      async function removeMentee(mentorUserId, menteeUserId) {
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/mentorship/remove-mentee/${mentorUserId}/${menteeUserId}`,
+            {
+              method: "POST",
+            }
+          );
+          const result = await response.json();
+          alert(result.message);
+          location.reload();
+        } catch (error) {
+          console.error("Error:", error);
+          alert("Failed to remove mentee. Please try again.");
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem("userId");
+        localStorage.removeItem("username");
+        localStorage.removeItem("role");
+        window.location.href = "login.html";
+      }
+
+      function goToProfile() {
+        window.location.href = "profile.html";
+      }
+    </script>
+  </head>
+  <body>
+    <header>
+      <h1>🎓 Mentor Dashboard</h1>
+      <div class="header-buttons">
+        <button class="profile-btn" onclick="goToProfile()">
+          <span>Profile</span>
+          <span>👤</span>
+        </button>
+        <button class="logout-btn" onclick="logout()">
+          <span>Logout</span>
+          <span>🚪</span>
+        </button>
+      </div>
+    </header>
+    <main>
+      <section>
+        <h2>👥 Your Mentees</h2>
+        <div id="menteeList"></div>
+      </section>
+      <section>
+        <h2>📫 Mentee Requests</h2>
+        <div id="requestList"></div>
+      </section>
+    </main>
+    <footer>
+      <p>
+        &copy; 2023 Mentorship Matching Platform | Making Connections That
+        Matter
+      </p>
+    </footer>
+  </body>
+</html>

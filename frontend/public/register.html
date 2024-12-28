@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #e3f2fd; /* Light blue background */
+            font-family: 'Arial', sans-serif;
+            display: flex; /* Use flexbox for centering */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            height: 100%; /* Full viewport height */
+            margin: 0; /* Remove default margin */
+        }
+
+        .auth-container {
+            max-width: 600px; /* Set a maximum width for the form */
+            width: 100%; /* Full width */
+            margin: 20px; /* Margin around the container */
+            padding: 2rem; /* Padding inside the form */
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            background: white; /* White background for the form */
+        }
+
+        .main-heading {
+            text-align: center; /* Center align heading */
+            font-size: 2rem; /* Heading size */
+            color: #084071; /* Heading color */
+            margin-bottom: 20px; /* Spacing below heading */
+            margin-top: 0; /* Ensure no margin at the top */
+        }
+
+        .title {
+            font-size: 2.5rem; /* Increased title size */
+            color: #084071; /* Title color */
+            margin-bottom: 20px; /* Spacing below title */
+            text-align: center; /* Center align title */
+        }
+
+        .input-field {
+            position: relative;
+            margin: 1rem 0; /* Spacing between input fields */
+        }
+
+        .input-field input,
+        select {
+            width: 100%; /* Full width for input fields */
+            padding: 12px; /* Padding inside input fields */
+            border: 1px solid #ddd; /* Border color */
+            border-radius: 5px; /* Rounded corners */
+            font-size: 16px; /* Font size */
+            margin-top: 0.5rem; /* Spacing above input fields */
+            box-sizing: border-box; /* Include padding in width */
+        }
+
+        .input-field label {
+            color: #1976d2; /* Label color */
+            font-weight: 600; /* Boldness */
+        }
+
+        .btn {
+            width: 100%; /* Full width for button */
+            padding: 12px; /* Padding inside button */
+            background: #2196f3; /* Button color */
+            color: white; /* Text color */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded corners */
+            font-size: 16px; /* Font size */
+            cursor: pointer; /* Pointer cursor on hover */
+            transition: background 0.3s; /* Transition effect */
+            margin: 1rem 0; /* Spacing above and below button */
+        }
+
+        .btn:hover {
+            background: #1976d2; /* Darker button color on hover */
+        }
+        .register-btn-container {
+        margin-top: 1rem; /* Margin above the register button */
+        display: flex; /* Use flexbox for alignment */
+        justify-content: center; /* Center align the register button */
+        align-items: center; /* Center align vertically */
+      }
+    </style>
+    <script type="module">
+        import { registerUser } from './api.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('registerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = {
+                    firstName: formData.get('first_name'),
+                    lastName: formData.get('last_name'),
+                    username: formData.get('username'),
+                    email: formData.get('email'),
+                    password: formData.get('password'),
+                    role: formData.get('role')
+                };
+                console.log('Data being sent:', data);
+                const result = await registerUser(data);
+                alert(result.message || result.error);
+                if (result.data && result.data.id) {
+                    localStorage.setItem('user_id', result.data.id);
+                    window.location.href = 'profile-setup.html';
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="auth-container">
+        <h1 class="main-heading">Create Your Account</h1>
+        <form id="registerForm" class="sign-in-form">
+            <div class="input-field">
+                <label for="label">First Name</label>
+                <input type="text" id="first_name" name="first_name" placeholder="First Name" required />
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="input-field">
+                <label for="last_name">Last Name</label>
+                <input type="text" id="last_name" name="last_name" placeholder="Last Name" required />
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="input-field">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Username" required />
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="input-field">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" placeholder="Email" required />
+                <i class="fas fa-envelope"></i>
+            </div>
+            <div class="input-field">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Password" required />
+                <i class="fas fa-lock"></i>
+            </div>
+            <div class="input-field">
+                <label for="role">Role</label>
+                <select id="role" name="role" required>
+                    <option value="mentor">Mentor</option>
+                    <option value="mentee">Mentee</option>
+                </select>
+            </div>
+            <button type="submit" class="btn">Register</button>
+        </form>
+        <div class="register-btn-container">
+            <p>Already registered? <a href="login.html" class="">Login</a></p>
+          </div>
+        </div>
+    </div>
+</body>
+</html>

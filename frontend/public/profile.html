@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - Mentorship Platform</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <script type="module">
+      import { checkAuth } from "./commons/auth.js";
+      checkAuth();
+    </script>
+
+    <style>
+      body {
+        background-color: #e3f2fd;
+        font-family: "Arial", sans-serif;
+      }
+
+      .profile-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        background: white;
+        transition: transform 0.3s ease;
+      }
+
+      .profile-container:hover {
+        transform: translateY(-5px);
+      }
+
+      .profile-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .profile-header h1 {
+        color: #1976d2;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        transition: color 0.3s ease;
+      }
+
+      .profile-header:hover h1 {
+        color: #2196f3;
+      }
+
+      .form-section {
+        background: #f9f9f9;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #333;
+        font-weight: 500;
+        transition: color 0.3s ease;
+      }
+
+      .form-group:hover label {
+        color: #2196f3;
+      }
+
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .form-group textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus {
+        border-color: #2196f3;
+        outline: none;
+        box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+      }
+
+      .skills-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+      }
+
+      .skill-tag {
+        background: #bbdefb;
+        color: #0d47a1;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background 0.3s ease, transform 0.3s ease;
+      }
+
+      .skill-tag:hover {
+        background: #90caf9;
+        transform: scale(1.05);
+      }
+
+      .skill-tag i {
+        cursor: pointer;
+        font-size: 0.8rem;
+        color: #e74c3c;
+        margin-left: 5px;
+      }
+
+      .skill-tag i:hover {
+        color: #c0392b;
+      }
+
+      .btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(90deg, #2196f3, #21cbf3);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .btn:hover {
+        background: linear-gradient(90deg, #1976d2, #1e88e5);
+        box-shadow: 0 4px 10px rgba(25, 118, 210, 0.5);
+      }
+
+      .privacy-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 1rem 0;
+      }
+
+      .privacy-toggle input[type="checkbox"] {
+        width: auto;
+      }
+
+      .edit-mode {
+        display: none;
+      }
+
+      .view-mode {
+        display: block;
+      }
+
+      .edit-toggle {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        color: #2196f3;
+        cursor: pointer;
+        font-size: 1.2rem;
+        transition: color 0.3s ease;
+      }
+
+      .edit-toggle:hover {
+        color: #1976d2;
+      }
+
+      .back-button {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        background: none;
+        border: none;
+        color: #2196f3;
+        cursor: pointer;
+        font-size: 1.2rem;
+        transition: color 0.3s ease;
+      }
+
+      .back-button:hover {
+        color: #1976d2;
+      }
+
+      @media (max-width: 768px) {
+        .profile-container {
+          margin: 1rem;
+          padding: 1rem;
+        }
+
+        .profile-header h1 {
+          font-size: 1.5rem;
+        }
+      }
+
+      h2 {
+        color: #1976d2;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #2196f3;
+        padding-bottom: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="profile-container">
+      <button class="back-button" onclick="goToDashboard()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <button class="edit-toggle" onclick="toggleEditMode()">
+        <i class="fas fa-edit"></i>
+      </button>
+
+      <div class="profile-header">
+        <h1>Your Profile</h1>
+      </div>
+
+      <!-- View Mode -->
+      <div id="viewMode" class="view-mode">
+        <div class="form-section">
+          <h2>Bio</h2>
+          <div class="form-group">
+            <p id="viewBio"></p>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2>Skills</h2>
+          <div class="form-group">
+            <div class="skills-container" id="viewSkills"></div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2>Interests</h2>
+          <div class="form-group">
+            <div class="skills-container" id="viewInterests"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Mode -->
+      <form id="profileForm" class="edit-mode">
+        <div class="form-section">
+          <h2>Bio</h2>
+          <div class="form-group">
+            <textarea
+              name="bio"
+              placeholder="Tell us about yourself..."
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <h2>Skills</h2>
+            <input type="text" id="skillInput" placeholder="Add skills" />
+            <button type="button" id="addSkillButton">Add Skill</button>
+            <div class="skills-container" id="skillsContainer"></div>
+            <input type="hidden" name="skills" id="skillsHidden" />
+          </div>
+
+          <div class="form-group">
+            <h2>Interests</h2>
+            <input type="text" id="interestInput" placeholder="Add interests" />
+            <button type="button" id="addInterestButton">Add Interest</button>
+            <div class="skills-container" id="interestsContainer"></div>
+            <input type="hidden" name="interests" id="interestsHidden" />
+          </div>
+
+          <div class="privacy-toggle">
+            <input type="checkbox" id="isPublic" name="is_public" />
+            <label for="isPublic">Make profile public</label>
+          </div>
+        </div>
+
+        <input type="hidden" name="user_id" id="user_id" />
+        <button type="submit" class="btn">Update Profile</button>
+      </form>
+    </div>
+
+    <script>
+      const API_BASE_URL = "https://mentorship-platform-backend.onrender.com/api"; // Base URL for API calls
+      const tags = new Set();
+      const interestTags = new Set();
+
+      document.addEventListener("DOMContentLoaded", async () => {
+        const userId = localStorage.getItem("userId");
+        document.getElementById("user_id").value = userId;
+
+        // Fetch and display profile data
+        try {
+          const response = await fetch(`${API_BASE_URL}/profile/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+          const result = await response.json();
+
+          if (result.success) {
+            const profile = result.data;
+
+            // Update view mode
+            document.getElementById("viewBio").textContent =
+              profile.bio || "No bio added";
+
+            if (profile.skills) {
+              const skillsContainer = document.getElementById("viewSkills");
+              profile.skills.split(",").forEach((skill) => {
+                const tag = document.createElement("div");
+                tag.className = "skill-tag";
+                tag.textContent = skill;
+                skillsContainer.appendChild(tag);
+              });
+            }
+
+            if (profile.interests) {
+              const interestsContainer =
+                document.getElementById("viewInterests");
+              profile.interests.split(",").forEach((interest) => {
+                const tag = document.createElement("div");
+                tag.className = "skill-tag";
+                tag.textContent = interest;
+                interestsContainer.appendChild(tag);
+              });
+            }
+
+            // Populate the form with existing data
+            document.querySelector("textarea[name='bio']").value =
+              profile.bio || "";
+            document.getElementById("isPublic").checked = profile.is_public;
+
+            // Populate skills and interests
+            if (profile.skills) {
+              profile.skills.split(",").forEach((skill) => {
+                tags.add(skill.trim());
+              });
+              updateSkillTags();
+            }
+
+            if (profile.interests) {
+              profile.interests.split(",").forEach((interest) => {
+                interestTags.add(interest.trim());
+              });
+              updateInterestTags();
+            }
+          } else {
+            throw new Error(result.message);
+          }
+        } catch (error) {
+          alert(error.message);
+        }
+
+        // Prevent form submission on Enter key press
+        const inputs = document.querySelectorAll(
+          "#profileForm input, #profileForm textarea"
+        );
+        inputs.forEach((input) => {
+          input.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+            }
+          });
+        });
+
+        // Handle adding skills
+        document
+          .getElementById("addSkillButton")
+          .addEventListener("click", () => {
+            const skillInput = document.getElementById("skillInput");
+            const skill = skillInput.value.trim();
+            if (skill) {
+              tags.add(skill);
+              updateSkillTags();
+              skillInput.value = "";
+            }
+          });
+
+        // Handle adding interests
+        document
+          .getElementById("addInterestButton")
+          .addEventListener("click", () => {
+            const interestInput = document.getElementById("interestInput");
+            const interest = interestInput.value.trim();
+            if (interest) {
+              interestTags.add(interest);
+              updateInterestTags();
+              interestInput.value = "";
+            }
+          });
+
+        // Handle form submission
+        document
+          .getElementById("profileForm")
+          .addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            data.is_public = formData.get("is_public") === "on";
+            data.skills = Array.from(tags).join(",");
+            data.interests = Array.from(interestTags).join(",");
+
+            try {
+              const response = await fetch(
+                `${API_BASE_URL}/profile/${data.user_id}`,
+                {
+                  method: "PUT",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                  body: JSON.stringify(data),
+                }
+              );
+
+              const result = await response.json();
+              if (result.success) {
+                alert(result.message);
+                toggleEditMode();
+                location.reload();
+              } else {
+                throw new Error(result.message);
+              }
+            } catch (error) {
+              alert(error.message);
+            }
+          });
+      });
+
+      function updateSkillTags() {
+        const container = document.getElementById("skillsContainer");
+        container.innerHTML = "";
+        tags.forEach((tag) => {
+          const tagElement = document.createElement("div");
+          tagElement.className = "skill-tag";
+          tagElement.innerHTML = `${tag} <i class="fas fa-times" onclick="removeSkill('${tag}')"></i>`;
+          container.appendChild(tagElement);
+        });
+        document.getElementById("skillsHidden").value =
+          Array.from(tags).join(",");
+      }
+
+      function updateInterestTags() {
+        const container = document.getElementById("interestsContainer");
+        container.innerHTML = "";
+        interestTags.forEach((tag) => {
+          const tagElement = document.createElement("div");
+          tagElement.className = "skill-tag";
+          tagElement.innerHTML = `${tag} <i class="fas fa-times" onclick="removeInterest('${tag}')"></i>`;
+          container.appendChild(tagElement);
+        });
+        document.getElementById("interestsHidden").value =
+          Array.from(interestTags).join(",");
+      }
+
+      function removeSkill(tag) {
+        tags.delete(tag);
+        updateSkillTags();
+      }
+
+      function removeInterest(tag) {
+        interestTags.delete(tag);
+        updateInterestTags();
+      }
+
+      function toggleEditMode() {
+        const viewMode = document.getElementById("viewMode");
+        const editMode = document.getElementById("profileForm");
+
+        if (viewMode.style.display === "none") {
+          viewMode.style.display = "block";
+          editMode.style.display = "none";
+        } else {
+          viewMode.style.display = "none";
+          editMode.style.display = "block";
+        }
+      }
+
+      function goToDashboard() {
+        const role = localStorage.getItem("role");
+        if (role === "mentee") {
+          window.location.href = "mentee-dashboard.html";
+        } else if (role === "mentor") {
+          window.location.href = "mentor-dashboard.html";
+        } else {
+          window.location.href = "index.html";
+        }
+      }
+    </script>
+  </body>
+</html>

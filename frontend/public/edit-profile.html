@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="styles.css">
+    <script type="module">
+        import { checkAuth } from "./commons/auth.js";
+        checkAuth();
+      </script>
+  
+</head>
+<body>
+    <header>
+        <h1>Edit Your Profile</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="register.html">Register</a></li>
+                <li><a href="profile-setup.html">Profile Setup</a></li>
+                <li><a href="user-discovery.html">User Discovery</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Update Your Profile Information</h2>
+        <form id="editProfileForm">
+            <input type="text" name="skills" id="skills" placeholder="Skills" required>
+            <input type="text" name="interests" id="interests" placeholder="Interests" required>
+            <textarea name="bio" id="bio" placeholder="Bio"></textarea>
+            <input type="hidden" name="user_id" id="user_id">
+            <button type="submit">Save Changes</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2023 Mentorship Matching Platform</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const userId = localStorage.getItem('user_id');
+            document.getElementById('user_id').value = userId;
+
+            // Fetch user profile data
+            const response = await fetch(`/api/profile/${userId}`); // Adjust the endpoint as necessary
+            if (response.ok) {
+                const userProfile = await response.json();
+                // Populate the form fields with the user's current profile data
+                document.getElementById('skills').value = userProfile.skills || '';
+                document.getElementById('interests').value = userProfile.interests || '';
+                document.getElementById('bio').value = userProfile.bio || '';
+            } else {
+                alert('Failed to load profile data.');
+            }
+        });
+
+        document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            console.log('Data being sent:', data); // Log the data being sent
+
+            const response = await fetch('/api/profile', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+            const result = await response.json();
+            console.log('Response from server:', result); // Log the server response
+            if (result.success) {
+                alert('Profile updated successfully!');
+                window.location.href = 'user-discovery.html'; // Redirect to user discovery page
+            } else {
+                alert(result.message || result.error);
+            }
+        });
+    </script>
+</body>
+</html>
