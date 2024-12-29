@@ -14,7 +14,7 @@ router.get("/users/:UserId", (req, res) => {
         LEFT JOIN mentor_accepted_list mal ON u.id = mal.mentor_user_id
         WHERE p.is_public = TRUE 
         AND u.role = 'mentor'
-        AND (mrl.user_id IS NULL OR mrl.user_id != ? AND mrl.status NOT IN ('pending', 'accepted'))
+        AND (mrl.user_id IS NULL OR mrl.user_id != ?)
         AND (mal.user_id IS NULL OR mal.user_id != ?)
     `;
   connection.query(query, [UserId, UserId], (err, results) => {
