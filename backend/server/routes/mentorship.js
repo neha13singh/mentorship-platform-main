@@ -7,16 +7,24 @@ const router = express.Router();
 router.get("/users/:UserId", (req, res) => {
   const { UserId } = req.params;
   const query = `
-        SELECT DISTINCT u.id, u.username, u.role, p.skills, p.interests, p.bio 
-        FROM user u
-        LEFT JOIN profile p ON u.id = p.user_id
-        LEFT JOIN mentor_request_list mrl ON u.id = mrl.requestor_user_id
-        LEFT JOIN mentor_accepted_list mal ON u.id = mal.mentor_user_id
-        WHERE p.is_public = TRUE 
-        AND u.role = 'mentor'
-        AND (mrl.user_id IS NULL OR mrl.user_id != ?)
-        AND (mal.user_id IS NULL OR mal.user_id != ?)
-    `;
+  SELECT DISTINCT u.id, u.username, u.role, p.skills, p.interests, p.bio 
+  FROM user u
+  LEFT JOIN profile p ON u.id = p.user_id
+  WHERE p.is_public = TRUE 
+  AND u.role = 'mentor'
+  AND NOT EXISTS (
+    SELECT 1 
+    FROM mentor_request_list mrl 
+    WHERE mrl.requestor_user_id = ?
+    AND mrl.user_id = u.id
+  )
+  AND NOT EXISTS (
+    SELECT 1 
+    FROM mentor_accepted_list mal 
+    WHERE mal.mentor_user_id = u.id 
+    AND mal.user_id = ?
+  )
+`;
   connection.query(query, [UserId, UserId], (err, results) => {
     if (err) {
       console.error("Error executing query:", err);

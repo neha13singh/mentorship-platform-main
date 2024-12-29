@@ -124,6 +124,10 @@
         color: #666;
         margin-bottom: 0.8rem;
       }
+      .cancel-btn
+      {
+        background-color: #f39c12 !important;
+      }
 
       .mentor-card button {
         background: #3498db;
@@ -148,8 +152,9 @@
         border-left: 4px solid #f39c12;
       }
 
-      .mentor-card.rejected {
-        border-left: 4px solid #e74c3c;
+      
+      .mentor-card.available {
+        border-left: 4px solid #3b89f6;
       }
 
       #mentorList,
@@ -188,7 +193,7 @@
       }
     </style>
     <script>
-      const API_BASE_URL = "https://mentorship-platform-main-backend.onrender.com/api";
+      const API_BASE_URL = "http://localhost:3000/api";
 
       document.addEventListener("DOMContentLoaded", async () => {
         const userId = localStorage.getItem("userId");
@@ -207,7 +212,7 @@
         mentorList.innerHTML = mentors
           .map((mentor) => {
             return `
-                    <div class="mentor-card">
+                    <div class="mentor-card available">
                         <h3>👤 ${mentor.username} - ${mentor.role}</h3>
                         <p><strong>Bio:</strong> ${
                           mentor.bio || "No bio available"
@@ -268,13 +273,13 @@
         sentRequestsList.innerHTML = sentRequests
           .map((request) => {
             return `
-                    <div class="mentor-card ${request.status.toLowerCase()}">
+                    <div class="mentor-card pending">
                         <h3>👤 ${request.username} - ${request.role}</h3>
                         <p><strong>Status:</strong> ${request.status}</p>
                         <p><strong>Message:</strong> ${request.message}</p>
-                        <button onclick="cancelRequest(${
+                        <button  class="cancel-btn" onclick="cancelRequest(${
                           request.id
-                        })" class="cancel-btn">
+                        })" >
                             <span>❌ Cancel Request</span>
                         </button>
                     </div>
