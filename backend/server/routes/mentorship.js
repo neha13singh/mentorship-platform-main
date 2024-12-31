@@ -2,6 +2,39 @@ const express = require("express");
 const path = require("path");
 const connection = require(path.join(__dirname, "../../database/db"));
 const router = express.Router();
+// Fetch all mentors
+router.get('/all-mentors', async (req, res) => {
+  const query = `
+    SELECT u.id, u.username, u.role, p.skills, p.interests, p.bio 
+    FROM user u
+    LEFT JOIN profile p ON u.id = p.user_id
+    WHERE u.role = 'mentor'
+  `;
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching all mentors:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    res.json(results);
+  });
+});
+
+// Fetch all mentees
+router.get('/all-mentees', async (req, res) => {
+  const query = `
+    SELECT u.id, u.username, u.role, p.skills, p.interests, p.bio 
+    FROM user u
+    LEFT JOIN profile p ON u.id = p.user_id
+    WHERE u.role = 'mentee'
+  `;
+  connection.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching all mentees:", err);
+      return res.status(500).json({ error: "Database error" });
+    }
+    res.json(results);
+  });
+});
 
 // Get All Users with Profiles // will be used for user discovery
 router.get("/users/:UserId", (req, res) => {
@@ -323,5 +356,6 @@ router.post("/remove-mentee/:mentorUserId/:menteeUserId", (req, res) => {
     );
   });
 });
+
 
 module.exports = router;

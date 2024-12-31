@@ -277,8 +277,75 @@
                 `;
           })
           .join("");
+           // Fetch and display all mentors
+        const allMentors = await fetchAllMentorsWithoutFilter();
+        const allMentorsList = document.getElementById("allMentorsList");
+        allMentorsList.innerHTML = allMentors
+          .map((mentor) => {
+            return `
+                    <div class="mentee-card">
+                        <h3>👤 ${mentor.username} - ${mentor.role}</h3>
+                        <p><strong>Bio:</strong> ${
+                          mentor.bio || "No bio available"
+                        }</p>
+                        <p><strong>Skills:</strong> ${
+                          Array.isArray(mentor.skills)
+                            ? mentor.skills.join(", ")
+                            : mentor.skills || "No skills listed"
+                        }</p>
+                        <p><strong>Interests:</strong> ${
+                          Array.isArray(mentor.interests)
+                            ? mentor.interests.join(", ")
+                            : mentor.interests || "No interests listed"
+                        }</p>
+                    </div>
+                `;
+          })
+          .join("");
+                  // Fetch and display all mentees
+        const allMentees = await fetchAllMentees();
+        const allMenteesList = document.getElementById("allMenteesList");
+        allMenteesList.innerHTML = allMentees
+          .map((mentee) => {
+            return `
+                    <div class="mentee-card">
+                        <h3>👤 ${mentee.username} - ${mentee.role}</h3>
+                        <p><strong>Bio:</strong> ${
+                          mentee.bio || "No bio available"
+                        }</p>
+                        <p><strong>Skills:</strong> ${
+                          Array.isArray(mentee.skills)
+                            ? mentee.skills.join(", ")
+                            : mentee.skills || "No skills listed"
+                        }</p>
+                        <p><strong>Interests:</strong> ${
+                          Array.isArray(mentee.interests)
+                            ? mentee.interests.join(", ")
+                            : mentee.interests || "No interests listed"
+                        }</p>
+                    </div>
+                `;
+          })
+          .join("");
       });
-
+      async function fetchAllMentorsWithoutFilter() {
+        const response = await fetch(`${API_BASE_URL}/mentorship/all-mentors`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch all mentors");
+        }
+        const result = await response.json();
+        console.log("result", result);
+        return result;
+      }
+      async function fetchAllMentees() {
+        const response = await fetch(`${API_BASE_URL}/mentorship/all-mentees`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch all mentees");
+        }
+        const result = await response.json();
+        console.log("result", result);
+        return result;
+      }
       async function fetchMentees(userId) {
         try {
           const response = await fetch(
@@ -397,6 +464,15 @@
         <h2>📫 Mentee Requests</h2>
         <div id="requestList"></div>
       </section>
+      <section>
+        <h2>👥 All Mentees</h2>
+        <div id="allMenteesList"></div>
+      </section>
+      <section>
+        <h2>👥 All Mentors</h2>
+        <div id="allMentorsList"></div>
+      </section>
+    
     </main>
     <footer>
       <p>
