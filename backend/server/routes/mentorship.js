@@ -154,16 +154,28 @@ router.post("/accept", (req, res) => {
               });
             }
 
-            connection.commit((err) => {
+            // Remove entry from mentor_request_list
+            const deleteQuery =
+              "DELETE FROM mentor_request_list WHERE id = ?";
+            connection.query(deleteQuery, [requestId], (err) => {
               if (err) {
                 return connection.rollback(() => {
-                  console.error("Error committing transaction:", err);
+                  console.error("Error deleting request:", err);
                   res.status(500).json({ error: "Database error" });
                 });
               }
-              res.status(200).json({
-                success: true,
-                message: "Request accepted successfully",
+
+              connection.commit((err) => {
+                if (err) {
+                  return connection.rollback(() => {
+                    console.error("Error committing transaction:", err);
+                    res.status(500).json({ error: "Database error" });
+                  });
+                }
+                res.status(200).json({
+                  success: true,
+                  message: "Request accepted successfully",
+                });
               });
             });
           }
@@ -172,13 +184,12 @@ router.post("/accept", (req, res) => {
     });
   });
 });
-
+// Reject Mentorship Request
 // Reject Mentorship Request
 router.post("/reject", (req, res) => {
   const { requestId } = req.body;
 
-  const query =
-    'UPDATE mentor_request_list SET status = "rejected" WHERE id = ?';
+  const query = 'DELETE FROM mentor_request_list WHERE id = ?';
   connection.query(query, [requestId], (err, results) => {
     if (err) {
       console.error("Error executing query:", err);
